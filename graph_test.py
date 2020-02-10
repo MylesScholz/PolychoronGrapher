@@ -158,7 +158,7 @@ class Window(pyglet.window.Window):
         glVertex3f( 0, -75,  75)
         
         glEnd()
-        """
+        # """
         
         # Pentachoron wireframe
         """
@@ -189,7 +189,7 @@ class Window(pyglet.window.Window):
         i = 0
         for face in vertices:
             glBegin(GL_POLYGON)
-            glColor4ub(255, 255, 255, 127)
+            glColor4ub(255, 127, 0, 127)
             gl_normal = (GLfloat * len(normals[i]))(*normals[i])
             glNormal3fv(gl_normal)
             
@@ -200,10 +200,10 @@ class Window(pyglet.window.Window):
             
             glEnd()
             i += 1
-        """
+        # """
         
         # Translucent tesseract
-        # """
+        
         obj = tesseract.run()
         vertices = polychoron.face_loops(obj.vertices, obj.edges, obj.faces)
         normals = calc_normals(obj)
@@ -211,7 +211,7 @@ class Window(pyglet.window.Window):
         i = 0
         for face in vertices:
             glBegin(GL_POLYGON)
-            glColor4ub(255, 255, 255, 127)
+            glColor4ub(255, 0, 255, 127)
             gl_normal = (GLfloat * len(normals[i]))(*normals[i])
             glNormal3fv(gl_normal)
             
