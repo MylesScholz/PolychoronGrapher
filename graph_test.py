@@ -10,23 +10,18 @@ import pentachoron
 import tesseract
 import polychoron
 
-# Angle and axis increment for controls
-INCREMENT = 0.05
+# Angle increment for controls
+INCREMENT = 10
 
 class Window(pyglet.window.Window):
-    
-    # Initialize rotation axis and quaternion
-    axis = Quaternion()
-    axisX = axisY = axisZ = 1
-    angle = math.pi / 4
-    
-    axis.set_sv_form((angle, [axisX, axisY, axisZ]))
-        
-    axis_v = axis.get_sv_form()[1]
-    axisX = axis_v[0]
-    axisY = axis_v[1]
-    axisZ = axis_v[2]
-    
+
+    # The endpoint of the axis around which the shape will rotate
+    axis = [1, 1, 1]
+    # The angle in degrees of anticlockwise (righthanded) rotation
+    angle = 0
+    # The angles about the x-, y-, and z-axes that the rotation axis will be rotated
+    axisRotation = [0, 0, 0]
+
     def __init__(self, width, height, title=''):
         super(Window, self).__init__(width, height, title)
         glClearColor(0, 0, 0, 1)
@@ -80,25 +75,13 @@ class Window(pyglet.window.Window):
         
         glPushMatrix()
         
-        # Convert the axis quaternion into a rotation matrix
-        matrix = self.axis.get_rotation_matrix()
-        
-        # Convert the 3x3 rotation matrix into a linear, column-major 16 item list
-        linear = []
-        for i in range(3):
-            for j in range(3):
-                linear.append(matrix[j][i])
-            linear.append(0)
-        linear.extend([0, 0, 0, 1])
-        
-        # Apply the linearized rotation matrix
-        gl_linear = (GLfloat * len(linear))(*linear)
-        glMultMatrixf(gl_linear)
+        # Apply rotation
+        glRotatef(self.angle, self.axis[0], self.axis[1], self.axis[2])
         
         glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE)
         
         # Colored cube for testing
-        """
+        
         glBegin(GL_QUADS)
  
         # Top - Green
@@ -178,7 +161,7 @@ class Window(pyglet.window.Window):
             glVertex3fv(gl_vert_b)
         
         glEnd()
-        """
+        # """
         
         # Translucent pentachoron
         """
@@ -203,7 +186,7 @@ class Window(pyglet.window.Window):
         # """
         
         # Translucent tesseract
-        
+        """
         obj = tesseract.run()
         vertices = polychoron.face_loops(obj.vertices, obj.edges, obj.faces)
         normals = calc_normals(obj)
@@ -225,9 +208,14 @@ class Window(pyglet.window.Window):
         # """
         
         glPopMatrix()
-        
+
         # Draw the rotation axis
         glPushMatrix()
+
+        # Apply rotation to axis
+        glRotatef(self.axisRotation[0], 1, 0, 0)
+        glRotatef(self.axisRotation[1], 0, 1, 0)
+        glRotatef(self.axisRotation[2], 0, 0, 1)
         
         glLineWidth(5)
         glBegin(GL_LINES)
@@ -235,7 +223,7 @@ class Window(pyglet.window.Window):
         # Rotation Axis - White
         glColor4ub(255, 255, 255, 127)
         glVertex3f(0, 0, 0)
-        glVertex3f(self.axisX*100, self.axisY*100, self.axisZ*100)
+        glVertex3f(self.axis[0]*100, self.axis[0]*100, self.axis[0]*100)
         
         glEnd()
         
@@ -257,38 +245,25 @@ class Window(pyglet.window.Window):
         glTranslatef(0, 0, -400)
         
     def on_key_press(self, symbol, modifiers):
-        # Alter the rotation axis vector and angle
+        # Rotation controls
         if symbol == key.Q:
-            self.axisX += INCREMENT
+            self.axisRotation[0] += INCREMENT
         elif symbol == key.A:
-            self.axisX -= INCREMENT
+            self.axisRotation[0] -= INCREMENT
         elif symbol == key.W:
-            self.axisY += INCREMENT
+            self.axisRotation[1] += INCREMENT
         elif symbol == key.S:
-            self.axisY -= INCREMENT
+            self.axisRotation[1] -= INCREMENT
         elif symbol == key.E:
-            self.axisZ += INCREMENT
+            self.axisRotation[2] += INCREMENT
         elif symbol == key.D:
-            self.axisZ -= INCREMENT
+            self.axisRotation[2] -= INCREMENT
         elif symbol == key.R:
             self.angle += INCREMENT
         elif symbol == key.F:
             self.angle -= INCREMENT
         
-        # Loop the angle on [0, 2*pi]
-        if self.angle > 2*math.pi:
-            self.angle -= 2*math.pi
-        elif self.angle < 0:
-            self.angle += 2*math.pi
-        
-        # Update the quaternion to the new vector
-        self.axis.set_sv_form((self.angle, [self.axisX, self.axisY, self.axisZ]))
-        
-        axis_v = self.axis.get_sv_form()[1]
-        self.axisX = axis_v[0]
-        self.axisY = axis_v[1]
-        self.axisZ = axis_v[2]
-        
+
     
 def run():
     Window(640, 480, 'Graph Test')
@@ -331,3 +306,5 @@ def calc_normals(obj):
         normals.append(normalize(cross(u, v)))
     
     return normals
+
+run()
