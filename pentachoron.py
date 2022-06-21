@@ -18,8 +18,8 @@ def run():
     obj.set_faces([0,1,4],[0,2,5],[0,3,6],[1,2,7],[1,3,8],[2,3,9],[4,5,7],[4,6,8],[5,6,9],[7,8,9])
     obj.set_cells([0,1,3,6],[0,2,3,7],[1,2,5,8],[3,4,5,9],[6,7,8,9])
     
-    obj.convert_to_eye([0,0,0,4],[0,0,0,0],[0,0,1,0],[0,1,0,0])
-    obj.perspective_project((math.pi / 2),[0,0,0],[4,4,4])
+    obj.convert_to_eye([0,0,0,2],[0,0,0,0],[0,0,1,0],[0,1,0,0])
+    obj.perspective_project((math.pi / 2),[0,0,0],[2,2,2])
     
     # print(obj.vertices)
     return obj

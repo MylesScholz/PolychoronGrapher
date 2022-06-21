@@ -15,12 +15,8 @@ INCREMENT = 10
 
 class Window(pyglet.window.Window):
 
-    # The endpoint of the axis around which the shape will rotate
-    axis = [1, 1, 1]
-    # The angle in degrees of anticlockwise (righthanded) rotation
-    angle = 0
-    # The angles about the x-, y-, and z-axes that the rotation axis will be rotated
-    axisRotation = [0, 0, 0]
+    # Angles in degrees of anticlockwise (righthanded) rotations around the respective x-, y-, and z-axes
+    rotations = np.array([0, 0, 0])
 
     def __init__(self, width, height, title=''):
         super(Window, self).__init__(width, height, title)
@@ -75,13 +71,17 @@ class Window(pyglet.window.Window):
         
         glPushMatrix()
         
-        # Apply rotation
-        glRotatef(self.angle, self.axis[0], self.axis[1], self.axis[2])
+        # Apply rotation around x-axis
+        glRotatef(self.rotations[0], 1, 0, 0)
+        # Apply rotation around y-axis
+        glRotatef(self.rotations[1], 0, 1, 0)
+        # Apply rotation around z-axis
+        glRotatef(self.rotations[2], 0, 0, 1)
         
         glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE)
         
         # Colored cube for testing
-        
+        """
         glBegin(GL_QUADS)
  
         # Top - Green
@@ -164,7 +164,7 @@ class Window(pyglet.window.Window):
         # """
         
         # Translucent pentachoron
-        """
+        
         obj = pentachoron.run()
         vertices = polychoron.face_loops(obj.vertices, obj.edges, obj.faces)
         normals = calc_normals(obj)
@@ -208,26 +208,6 @@ class Window(pyglet.window.Window):
         # """
         
         glPopMatrix()
-
-        # Draw the rotation axis
-        glPushMatrix()
-
-        # Apply rotation to axis
-        glRotatef(self.axisRotation[0], 1, 0, 0)
-        glRotatef(self.axisRotation[1], 0, 1, 0)
-        glRotatef(self.axisRotation[2], 0, 0, 1)
-        
-        glLineWidth(5)
-        glBegin(GL_LINES)
-        
-        # Rotation Axis - White
-        glColor4ub(255, 255, 255, 127)
-        glVertex3f(0, 0, 0)
-        glVertex3f(self.axis[0]*100, self.axis[0]*100, self.axis[0]*100)
-        
-        glEnd()
-        
-        glPopMatrix()
         
     def on_resize(self, width, height):
         aspectRatio = width / height
@@ -246,24 +226,24 @@ class Window(pyglet.window.Window):
         
     def on_key_press(self, symbol, modifiers):
         # Rotation controls
-        if symbol == key.Q:
-            self.axisRotation[0] += INCREMENT
-        elif symbol == key.A:
-            self.axisRotation[0] -= INCREMENT
-        elif symbol == key.W:
-            self.axisRotation[1] += INCREMENT
+        if symbol == key.W:
+            self.rotations[0] += INCREMENT
         elif symbol == key.S:
-            self.axisRotation[1] -= INCREMENT
-        elif symbol == key.E:
-            self.axisRotation[2] += INCREMENT
+            self.rotations[0] -= INCREMENT
+        elif symbol == key.A:
+            self.rotations[1] += INCREMENT
         elif symbol == key.D:
-            self.axisRotation[2] -= INCREMENT
-        elif symbol == key.R:
-            self.angle += INCREMENT
-        elif symbol == key.F:
-            self.angle -= INCREMENT
+            self.rotations[1] -= INCREMENT
+        elif symbol == key.Q:
+            self.rotations[2] += INCREMENT
+        elif symbol == key.E:
+            self.rotations[2] -= INCREMENT
         
-
+        for angle in self.rotations:
+            if angle > 360:
+                angle -= 360
+            elif angle < 0:
+                angle += 360
     
 def run():
     Window(640, 480, 'Graph Test')
